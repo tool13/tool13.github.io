@@ -2813,6 +2813,11 @@
     padding-top: 90px;
     padding-bottom: 70px;
   }
+
+  .features__item:first-child {
+    padding-top: 150px;
+    padding-bottom: 130px;
+  }
 }
 @media (min-width: 5120px) {
   .features__item {
