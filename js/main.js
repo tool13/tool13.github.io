@@ -2,6 +2,14 @@
 
 const SLIDER_2_COPY_ANIMATION_DURATION = 400;
 
+const FADE_TEXTS_MAX_HEIGHTS = {
+  '0': 131,
+  '667': 133,
+  '1024': 184,
+  '2560': 350,
+  '5120': 650,
+};
+
 const goodSection = document.querySelector('.good');
 
 const slider2 = goodSection.querySelector('.good__slider2-wrapper');
@@ -10,6 +18,29 @@ const slider2Copy = slider2.cloneNode(true);
 slider2Copy.ariaHidden = 'true';
 slider2Copy.classList.add('good__slider2-wrapper--copy');
 slider2Copy.style.visibility = 'hidden';
+
+const slider2CopyCloseButton = document.createElement('a');
+slider2CopyCloseButton.className = 'good__slider2-close';
+slider2Copy.appendChild(slider2CopyCloseButton);
+
+slider2CopyCloseButton.addEventListener('click', (evt) => {
+  evt.preventDefault();
+
+  slider2Copy.style.opacity = 0;
+
+  setTimeout(() => {
+    slider2Copy.style.visibility = 'hidden';
+  }, SLIDER_2_COPY_ANIMATION_DURATION);
+});
+
+const slider2CopyOpenButtons = goodSection.querySelectorAll('.good__element--jumper');
+
+slider2CopyOpenButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    slider2Copy.style.visibility = 'visible';
+    slider2Copy.style.opacity = 1;
+  });
+});
 
 goodSection.appendChild(slider2Copy);
 
@@ -77,21 +108,36 @@ let swiper2 = new Swiper(".swiper-2", {
   },
 });
 
-const fadeTextButtons = document.querySelectorAll('.fade-text__button');
+const fadeTextsWrappers = document.querySelectorAll('.fade-text');
+let fadeTextsMaxHeight;
 
-for (let button of fadeTextButtons) {
-  button.addEventListener('click', () => {
-    if (button.parentNode.classList.contains('fade-text--lessen')) {
-      button.parentNode.classList.remove('fade-text--lessen');
-      button.textContent = 'Less';
-      button.classList.add('fade-text__button--less');
-    } else {
-      button.parentNode.classList.add('fade-text--lessen');
-      button.textContent = 'More';
-      button.classList.remove('fade-text__button--less');
-    }
-  });
+for (let viewport in FADE_TEXTS_MAX_HEIGHTS) {
+  if (window.innerWidth >= viewport) {
+    fadeTextsMaxHeight = FADE_TEXTS_MAX_HEIGHTS[viewport];
+  }
 }
+
+fadeTextsWrappers.forEach((fadeTextWrapper) => {
+  if (fadeTextWrapper.querySelector('.fade-text__inner').offsetHeight > fadeTextsMaxHeight) {
+    fadeTextWrapper.classList.add('fade-text--lessen');
+
+    const button = fadeTextWrapper.querySelector('.fade-text__button');
+
+    button.style.display = 'inline-block';
+
+    button.addEventListener('click', () => {
+      if (fadeTextWrapper.classList.contains('fade-text--lessen')) {
+        fadeTextWrapper.classList.remove('fade-text--lessen');
+        button.textContent = 'Less';
+        button.classList.add('fade-text__button--less');
+      } else {
+        fadeTextWrapper.classList.add('fade-text--lessen');
+        button.textContent = 'More';
+        button.classList.remove('fade-text__button--less');
+      }
+    });
+  };
+});
 
 const goodSectionViewToggler = goodSection.querySelector('.good__elements .good__element--jumper');
 
@@ -106,23 +152,23 @@ goodSectionViewToggler.addEventListener('click', (evt) => {
   }
 });
 
-window.onload = () => {
-  let observer = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        slider2Copy.style.opacity = 0;
-        setTimeout(() => {
-          slider2Copy.style.visibility = 'hidden';
-        }, SLIDER_2_COPY_ANIMATION_DURATION);
-      } else if (slider2.getBoundingClientRect().y > 0) {
-        slider2Copy.style.visibility = 'visible';
-        slider2Copy.style.opacity = 1;
-      }
-    })
-  }, { threshold: 0.7 });
+// window.onload = () => {
+//   let observer = new IntersectionObserver((entries, observer) => {
+//     entries.forEach(entry => {
+//       if (entry.isIntersecting) {
+//         slider2Copy.style.opacity = 0;
+//         setTimeout(() => {
+//           slider2Copy.style.visibility = 'hidden';
+//         }, SLIDER_2_COPY_ANIMATION_DURATION);
+//       } else if (slider2.getBoundingClientRect().y > 0) {
+//         slider2Copy.style.visibility = 'visible';
+//         slider2Copy.style.opacity = 1;
+//       }
+//     })
+//   }, { threshold: 0.01 });
 
-  observer.observe(slider2);
-}
+//   observer.observe(slider2);
+// }
 
 const videosWrappers = document.querySelectorAll('.videos__wrapper');
 
